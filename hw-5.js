@@ -76,8 +76,8 @@ beforeEach ( () => {
 searchTerms.forEach((searchTerm, index) => {
   it(`should display notification ${index + 1}`, () => {
    
-        cy.get('[name="title"]', { timeout: 200000 }).type(searchTerm.testData.title);
-        cy.get('[name="content"]',  { timeout: 200000 }).type(searchTerm.testData.content);
+        cy.get('[name="title"]', { timeout: 200000 }).clear().type(searchTerm.testData.title);
+        cy.get('[name="content"]',  { timeout: 200000 }).clear().type(searchTerm.testData.content);
 
      
         cy.get('.mat-ripple.position-select', {timeout:100000}).click();
@@ -89,19 +89,20 @@ searchTerms.forEach((searchTerm, index) => {
         
 
       
-        cy.get('nb-card-footer .status-basic', {timeout:100000}).click()
+        cy.get('nb-card-footer .status-basic', {timeout:200000}).click()
         cy.get('nb-toast[ng-reflect-toast]').then(toast=>{      
 
       
-        cy.get('.icon-container [data-name="${searchTerm.expectedResult.icon}"]', { timeout: 100000})
+        cy.wrap(toast).find(`.icon-container [data-name="${searchTerm.expectedResult.icon}"]`, { timeout: 100000})
         .should('exist')
         .and('have.attr', 'data-name', searchTerm.expectedResult.icon);
       
-        cy.get('[class="title subtitle"]', {timeout:100000}).should('have.text', searchTerm.expectedResult.title);
-        cy.get('[class="message"]', {timeout:100000}).should('have.text', searchTerm.expectedResult.content);
-        cy.get('[class="message"]', {timeout:100000}).should('have.css', 'background-color', searchTerm.expectedResult.content);
+        cy.wrap(toast).find('[class="title subtitle"]', {timeout:100000}).should('contain', searchTerm.expectedResult.title);
+        cy.wrap(toast).find('[class="message"]', {timeout:100000}).should('have.text', searchTerm.expectedResult.content);
+        cy.wrap(toast).find('nb-toast[ng-reflect-toast]', {timeout:100000}).should('be.visible').and('have.css', 'background-color', searchTerm.expectedResult.color);
 
-        cy.get(getPositionSelector(searchTerm.expectedResult.position)).should('have.text', searchTerm.expectedResult.position);
+
+        cy.wrap(toast).find(getPositionSelector(searchTerm.expectedResult.position)).should('have.text', searchTerm.expectedResult.position);
 
 // Функция для получения динамического селектора в зависимости от позиции
 function getPositionSelector(position) {
